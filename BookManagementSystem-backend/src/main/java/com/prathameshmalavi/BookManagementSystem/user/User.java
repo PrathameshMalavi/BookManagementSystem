@@ -1,5 +1,7 @@
 package com.prathameshmalavi.BookManagementSystem.user;
 
+import com.prathameshmalavi.BookManagementSystem.book.Book;
+import com.prathameshmalavi.BookManagementSystem.history.BookTransactionHistory;
 import com.prathameshmalavi.BookManagementSystem.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +45,11 @@ public class User implements UserDetails, Principal {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
+    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
+    private List<Book> books;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHistory> histories;
 
 
     @CreatedDate

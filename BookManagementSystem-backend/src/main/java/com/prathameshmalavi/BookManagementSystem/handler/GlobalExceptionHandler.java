@@ -1,6 +1,7 @@
 package com.prathameshmalavi.BookManagementSystem.handler;
 
 
+import com.prathameshmalavi.BookManagementSystem.exception.OperationNotPermittedException;
 import jakarta.mail.MessagingException;
 import jakarta.xml.bind.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -104,6 +105,19 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResposne.builder()
                                 .businessErrorDescription("Internal error, contact the admin")
+                                .error(exp.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(OperationNotPermittedException.class)
+    public ResponseEntity<ExceptionResposne> handleException(OperationNotPermittedException exp){
+
+        //log the exception
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ExceptionResposne.builder()
                                 .error(exp.getMessage())
                                 .build()
                 );

@@ -1,8 +1,13 @@
 package com.prathameshmalavi.BookManagementSystem.book;
 
 
+import com.prathameshmalavi.BookManagementSystem.common.BaseEntity;
+import com.prathameshmalavi.BookManagementSystem.feedback.Feedback;
+import com.prathameshmalavi.BookManagementSystem.history.BookTransactionHistory;
+import com.prathameshmalavi.BookManagementSystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -10,19 +15,15 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Book {
-
-    @Id
-    @GeneratedValue
-    private Integer id;
+public class Book extends BaseEntity {
 
     private String title;
 
@@ -34,25 +35,36 @@ public class Book {
 
     private String bookCover;
 
-    private String archived;
+    private boolean archived;
 
     private boolean shareable;
 
-    @CreatedDate
-    @Column(nullable = false , updatable = false)
-    private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Column(insertable = false)
-    private LocalDateTime lastModifiedDate;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
-    @CreatedBy
-    @Column(nullable = false , updatable = false)
-    private Integer createdBy;
+    @OneToMany(mappedBy = "book")
+    private List<Feedback> feedbacks;
 
-    @LastModifiedBy
-    @Column(insertable = false)
-    private LocalDateTime lastModifiedBy;
+    @OneToMany(mappedBy = "book")
+    private List<BookTransactionHistory> histories;
 
 
+    @Transient
+    public double getRate(){
+        if(feedbacks == null || feedbacks.isEmpty()){
+            return 0.0;
+        }
+
+        var rate = this.feedbacks.stream()
+                .mapToDouble((feedback) -> {
+                    return feedback.getNote();
+                }).average()
+                .orElse(0.0);
+
+        double roundedRate = Math.round(rate * 10.0) /10.0;
+
+        return roundedRate;
+    }
 }

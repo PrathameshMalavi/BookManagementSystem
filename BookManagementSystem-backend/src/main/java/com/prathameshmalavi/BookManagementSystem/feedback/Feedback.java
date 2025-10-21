@@ -1,8 +1,12 @@
 package com.prathameshmalavi.BookManagementSystem.feedback;
 
 
+import com.prathameshmalavi.BookManagementSystem.book.Book;
+import com.prathameshmalavi.BookManagementSystem.common.BaseEntity;
+import com.prathameshmalavi.BookManagementSystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -14,37 +18,17 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Feedback {
-
-    @Id
-    @GeneratedValue
-    private Integer id;
+public class Feedback extends BaseEntity {
 
     private Double note;  //starts 1 - 5
 
     private String comment;
 
-
-    @CreatedDate
-    @Column(nullable = false , updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(insertable = false)
-    private LocalDateTime lastModifiedDate;
-
-    @CreatedBy
-    @Column(nullable = false , updatable = false)
-    private Integer createdBy;
-
-    @LastModifiedBy
-    @Column(insertable = false)
-    private LocalDateTime lastModifiedBy;
-
-
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
 
 }
